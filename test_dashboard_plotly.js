@@ -1,54 +1,58 @@
 ////////////////////////////////////////////////////////////////////////////////
-//   Esse script cria uma classe ScreenHandler, filha de dataHandler, 
-//   e sobrecarrega o método updateScreen(). Um objeto é criado ao carregar a
-//   página, e é disponibilizado ao HTML.
-//   Para utilização desse código: 
-//    1) importe esse script na página HTML
-//    2) defina aqui no script a strin TAGS
-//    3) escreva a função updateScreen()
+//   This script creates a ScreenHandler class, inheriting from DataHandler,
+//   and overrides the updateScreen() method. An object is created when the
+//   page loads and is made available to the HTML.
+//   To use this code:
+//    1) import this script on the HTML page
+//    2) define the DATASOURCES string array here in the script
+//    3) write the updateScreen() function
 ////////////////////////////////////////////////////////////////////////////////
 
+// Convert long to timeStamp
+export const convertTimestamp = (timestamp, dateSeparator = "/", timeSeparator = ":") => {
+    let d = new Date(timestamp);
+    let yyyy = d.getFullYear(),
+    mm = ('0' + (d.getMonth() + 1)).slice(-2),
+    dd = ('0' + d.getDate()).slice(-2),
+    hh = d.getHours(),
+    min = ('0' + d.getMinutes()).slice(-2),
+    sec = ('0' + d.getSeconds()).slice(-2),
+
+    time = `${dd}${dateSeparator}${mm}${dateSeparator}${yyyy} ${hh}${timeSeparator}${min}${timeSeparator}${sec}`;
+
+    return time;
+};
 
 
-
-
-// Importa a classe DataHandler do arquivo dataHandler.js
-import { dataHandler } from './dataHandler.js'; 
-
-
+// Import the DataHandler class from dataHandler.js
+import { DataHandler } from './dataHandler.js';
 
 
 //////////////////////////////////////////////////////////
-//     Definição das TAGS do Dashboard:                 //
+//     Dashboard Data Source Definitions:               //
 //////////////////////////////////////////////////////////
-
-
-const TAGS = ['Temperatura','Pressão']
-
-
-//////////////////////////////////////////////////////////
+const DATASOURCES = ['Temperature', 'Pressure'];
 
 
 
 
+class ScreenHandler extends DataHandler {
+  constructor(dataSourceNames = []) {
+    super(dataSourceNames); // Calls the parent class (DataHandler) constructor
+    console.log(`Datasource Names: '${DATASOURCES}' `);
 
-class ScreenHandler extends dataHandler {
-  constructor(tags = []) {
-    super(tags); // Chama o construtor da classe pai (DataHandler)
-    console.log(`TAGs cadastradas: '${TAGS}' `);
-    console.log("ScreenHandler: Instância criada e pronta para gerenciar atualizações de tela.");
-  
-    this.plotly_data = [
+
+    this.plotlyData = [
         {
             type: "indicator",
             value: null,
             delta: { reference: 0 },
-            gauge: { 
-            axis: { 
-                visible: false, 
-                range: [0, 100] 
+            gauge: {
+            axis: {
+                visible: false,
+                range: [0, 100]
             },
-            bar: { color: "orange" } 
+            bar: { color: "orange" }
             },
             domain: { row: 0, column: 0 }
         },
@@ -62,14 +66,14 @@ class ScreenHandler extends dataHandler {
                 visible: false,
                 range: [0, 100]
             },
-            bar: { color: "darkblue" } // Cor para o primeiro gauge
+            bar: { color: "darkblue" } // Color for the first gauge
             },
             domain: { row: 0, column: 1 }
         }
-        
+
         ];
 
-    this.plotly_layout = {
+    this.plotlyLayout = {
     width: 600,
     height: 400,
     margin: { t: 25, b: 25, l: 25, r: 25 },
@@ -89,57 +93,59 @@ class ScreenHandler extends dataHandler {
         }
     }
     };
-    Plotly.newPlot('dashboard', this.plotly_data, this.plotly_layout);
+    Plotly.newPlot('dashboard', this.plotlyData, this.plotlyLayout);
   }
 
-  
+
   updateScreen() {
-    
-    console.log("ScreenHandler: Atualizando a tela com os novos dados...");
-    this._tags.forEach(tag => {
-      const dado = this.getDadoByTag(tag); // Usa o novo método da classe pai
-      switch (dado.Tag) {
-      
-      case 'Temperatura': {
-        this.plotly_data[0].value = dado.Data;
-        if (dado.Data >= 80){
-            this.plotly_data[0].gauge.bar.color = 'red';
+
+    console.log("ScreenHandler: Updating the screen with new data...");
+    this._dataSourceNames.forEach(name => {
+      const dataItem = this.getDataByDataSourceName(name); // Uses the new method from the parent class
+      if (!dataItem) return (false); // Ensures the data item exists
+
+      switch (dataItem.dataSourceName) {
+
+      case 'Temperature': {
+        this.plotlyData[0].value = dataItem.data;
+        if (dataItem.data >= 80){
+            this.plotlyData[0].gauge.bar.color = 'red';
         }
         else {
-             this.plotly_data[0].gauge.bar.color = 'orange';
+             this.plotlyData[0].gauge.bar.color = 'orange';
         }
         break;
-      } 
-      case 'Pressão': {
-        this.plotly_data[1].value = dado.Data;
-        break;
-      } 
-      
-      default:
-        console.log( `TAG: ${tag} -> Tag não encontrada. `);
- 
       }
-    
-    //   outputParagraph.textContent = output;
-     
+      case 'Pressure': {
+        this.plotlyData[1].value = dataItem.data;
+        break;
+      }
+
+      default:
+        console.log( `TAG: ${name} -> Data source not found. `);
+
+      }
+
+
     });
-     Plotly.react('dashboard', this.plotly_data, this.plotly_layout);
+     Plotly.react('dashboard', this.plotlyData, this.plotlyLayout);
+
+
   }
-  
+
 }
 
-// Garante que o objeto seja instanciado quando a página for carregada.
-// Para isso, você pode adicionar este script no final do seu <body>
-// ou usar um evento 'DOMContentLoaded'.
+// Ensures the object is instantiated when the page loads.
+// To do this, you can add this script at the end of your <body>
+// or use a 'DOMContentLoaded' event.
 export let myScreenHandler;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Você pode passar TAGs iniciais se desejar, ou uma lista vazia
-  const initialTags = TAGS; 
+  // You can pass initial data sources if desired, or an empty list
+  const initialTags = DATASOURCES;
   myScreenHandler = new ScreenHandler(initialTags);
-  console.log("ScreenHandler instanciado ao carregar a página.");
+  console.log("ScreenHandler instantiated upon page load.");
 
-   // EXPOR AO ESCOPO GLOBAL AQUI
+   // EXPOSE TO GLOBAL SCOPE HERE
   window.myScreenHandler = myScreenHandler; //
 });
-

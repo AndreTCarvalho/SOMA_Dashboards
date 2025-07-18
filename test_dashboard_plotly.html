@@ -1,55 +1,59 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script type="module" src="dataHandler.js"></script>
     <script type="module" src="test_dashboard_plotly.js"></script>
-    <title>Atualizar Dados de TAGs</title>
+    <title>Update Data</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
+            margin: 10px; /* Reduced margin */
+            padding: 10px; /* Reduced padding */
             background-color: #f4f4f4;
             color: #333;
+            font-size: 0.9em; /* Reduced body font size */
         }
         .container {
             background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 30px auto;
+            padding: 15px; /* Reduced container padding */
+            border-radius: 6px; /* Slightly smaller border */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            max-width: 350px; /* Much smaller max container width */
+            margin: 20px auto; /* Adjusted margin */
         }
         h1 {
             color: #0056b3;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 15px; /* Reduced bottom margin */
+            font-size: 1.3em; /* Reduced title font size */
         }
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px; /* Reduced bottom margin */
             font-weight: bold;
+            font-size: 0.85em; /* Reduced label font size */
         }
         input[type="text"],
-        input[type="number"] { /* Adicionado input[type="number"] aqui */
-            width: calc(100% - 22px); /* Ajusta para padding e borda */
-            padding: 10px;
-            margin-bottom: 20px;
+        input[type="number"],
+        select {
+            width: calc(100% - 14px); /* Greatly reduced width to compensate for padding and border */
+            padding: 5px; /* Reduced field padding */
+            margin-bottom: 10px; /* Reduced bottom margin for fields */
             border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 3px; /* Slightly smaller border */
+            font-size: 0.9em; /* Reduced field font size */
         }
         button {
             background-color: #007bff;
             color: white;
-            padding: 12px 20px;
+            padding: 8px 15px; /* Reduced button padding */
             border: none;
-            border-radius: 5px;
+            border-radius: 4px; /* Slightly smaller border */
             cursor: pointer;
-            font-size: 18px;
+            font-size: 1em; /* Adjusted button font size */
             transition: background-color 0.3s ease;
             width: 100%;
         }
@@ -57,21 +61,22 @@
             background-color: #0056b3;
         }
         #outputParagraph {
-            margin-top: 25px;
-            padding: 15px;
+            margin-top: 15px; /* Reduced top margin */
+            padding: 10px; /* Reduced padding */
             border: 1px dashed #007bff;
             background-color: #e6f2ff;
-            border-radius: 4px;
-            min-height: 30px; /* Para mostrar a área mesmo que vazia */
-            font-size: 1.1em;
+            border-radius: 3px; /* Slightly smaller border */
+            min-height: 20px; /* Reduced minimum height */
+            font-size: 0.9em; /* Reduced font size */
             color: #0056b3;
-            word-wrap: break-word; /* Garante que textos longos quebrem a linha */
+            word-wrap: break-word;
         }
         .message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
+            margin-top: 10px; /* Reduced top margin */
+            padding: 8px; /* Reduced padding */
+            border-radius: 3px; /* Slightly smaller border */
             font-weight: bold;
+            font-size: 0.85em; /* Reduced message font size */
         }
         .message.success {
             background-color: #d4edda;
@@ -87,23 +92,39 @@
 </head>
 <body>
     <div class="container">
-        <h1>Atualizar Dados para as TAGs Pressão e Temperatura</h1>
+        <h1>Update TAG Data</h1>
 
-        <label for="inputTag">TAG:</label>
-        <input type="text" id="inputTag" placeholder="Ex: Temperatura">
+        <label for="inputDataSourceName">Data Source Name:</label>
+        <input type="text" id="inputDataSourceName" value="Temperature">
 
-        <label for="inputValue">Valor:</label>
-        <input type="number" id="inputValue" placeholder="Ex: 25.5">
+        <label for="inputValue">Value:</label>
+        <input type="number" id="inputValue" value="25.534">
 
-        <button onclick="sendData()">Atualizar TAG</button>
-        <div id="dashboard"></div>
+        <label for="inputAlarm">Alarm:</label>
+        <input type="number" id="inputAlarm" value="0">
+
+        <label for="inputTimestamp">Timestamp:</label>
+        <input type="number" id="inputTimestamp" value="1678886400000">
+
+        <label for="inputType">Type:</label>
+        <input type="text" id="inputType" value="scalar">
+
+        <label for="inputUnit">Unit:</label>
+        <input type="text" id="inputUnit" value="°C">
+
+        <label for="inputPrecisionDigits">Precision Digits:</label>
+        <input type="number" id="inputPrecisionDigits" value="2">
+
+        <button onclick="sendData()">Update TAG</button>
+
+        <p id="outputParagraph">Updated data will appear here.</p>
         <div id="messageArea" class="message" style="display: none;"></div>
-        
+        <div id="dashboard"></div>
     </div>
 
     <script>
         /**
-         * Função para exibir mensagens de sucesso/erro.
+         * Function to display success/error messages.
          */
         function displayMessage(message, type) {
             const messageArea = document.getElementById('messageArea');
@@ -111,63 +132,99 @@
             messageArea.className = `message ${type}`;
             messageArea.style.display = 'block';
 
-            // Opcional: Esconder a mensagem depois de alguns segundos
+            // Optional: Hide the message after a few seconds
             setTimeout(() => {
                 messageArea.style.display = 'none';
             }, 5000);
         }
 
         /**
-         * Função JavaScript para obter os valores dos campos
-         * e chamar o método updateDado do myScreenHandler.
+         * JavaScript function to get field values
+         * and call the updateData method of myScreenHandler.
          */
         function sendData() {
-            // Obter os elementos dos campos de entrada
-            const inputTagField = document.getElementById('inputTag');
-            const inputDataField = document.getElementById('inputValue');
-            const outputParagraph = document.getElementById('outputParagraph');
+            // Get input field elements
+            const dataSourceNameField = document.getElementById('inputDataSourceName');
+            const inputValueField = document.getElementById('inputValue');
+            const inputAlarmField = document.getElementById('inputAlarm');
+            const inputTimestampField = document.getElementById('inputTimestamp');
+            const inputTypeField = document.getElementById('inputType');
+            const inputUnitField = document.getElementById('inputUnit');
+            const inputPrecisionDigitsField = document.getElementById('inputPrecisionDigits');
 
-            // Obter os valores digitados
-            const tagValue = inputTagField.value.trim(); // .trim() remove espaços em branco extras
-            const dataValue = parseFloat(inputDataField.value); // Converte para número float
+            // Get entered values
+            const dataSourceName = dataSourceNameField.value.trim();
+            const value = parseFloat(inputValueField.value);
+            const alarm = parseFloat(inputAlarmField.value);
+            const timestamp = parseInt(inputTimestampField.value); // Converting to integer for timestamp
+            const type = inputTypeField.value.trim();
+            const unit = inputUnitField.value.trim();
+            const precisionDigits = parseInt(inputPrecisionDigitsField.value);
 
-            // Validar se os campos não estão vazios e se o valor é um número válido
-            if (!tagValue) {
-                displayMessage("Por favor, digite uma TAG.", "error");
-                inputTagField.focus();
+            // Validate if numeric fields are valid
+            if (isNaN(value)) {
+                displayMessage("Please enter a valid numeric 'Value'.", "error");
+                inputValueField.focus();
                 return;
             }
-            if (isNaN(dataValue)) {
-                displayMessage("Por favor, digite um valor numérico válido.", "error");
-                inputDataField.focus();
+            if (isNaN(alarm)) {
+                displayMessage("Please enter a valid numeric 'Alarm'.", "error");
+                inputAlarmField.focus();
+                return;
+            }
+            if (isNaN(timestamp)) {
+                displayMessage("Please enter a valid numeric 'Timestamp'.", "error");
+                inputTimestampField.focus();
+                return;
+            }
+            if (isNaN(precisionDigits)) {
+                displayMessage("Please enter a valid numeric 'Precision Digits'.", "error");
+                inputPrecisionDigitsField.focus();
+                return;
+            }
+            if (!type) {
+                displayMessage("Please enter the 'Type'.", "error");
+                inputTypeField.focus();
+                return;
+            }
+             if (!unit) {
+                displayMessage("Please enter the 'Unit'.", "error");
+                inputUnitField.focus();
                 return;
             }
 
- 
-            // Chamar myScreenHandler.updateDado se ele estiver disponível
+            // Call myScreenHandler.updateData if it's available
             if (window.myScreenHandler) {
-                const success = window.myScreenHandler.updateDado({
-                    Tag: tagValue,
-                    Type: "scalar", // Recebe um número
-                    Data: dataValue,
-                    Alarm: 0, // Valor padrão, pode ser ajustado se necessário
-                    DateTime: new Date() // Data e hora atuais
+                const success = window.myScreenHandler.updateData({
+                    dataSourceName: dataSourceName,
+                    data: value,
+                    alarm: alarm,
+                    timestamp: new Date(timestamp), // Creating a Date object from the timestamp
+                    type: type,
+                    unit: unit,
+                    digitsOfPrecision: precisionDigits
                 });
 
                 if (success) {
-                    displayMessage(`Dado para a TAG '${tagValue}' atualizado com sucesso!`, "success");
+                    displayMessage(`Data for Data Source '${dataSourceName}' updated successfully!`, "success");
                 } else {
-                    displayMessage(`Falha ao atualizar o dado para a TAG '${tagValue}'. Verifique a TAG.`, "error");
+                    displayMessage(`Failed to update data for DataSource '${dataSourceName}'. Check the console.`, "error");
                 }
             } else {
-                displayMessage("Erro: myScreenHandler não está acessível. Verifique o console.", "error");
-                console.error("myScreenHandler não foi instanciado ou não está globalmente acessível.");
+                displayMessage("Error: myScreenHandler is not accessible. Check the console.", "error");
+                console.error("myScreenHandler was not instantiated or is not globally accessible.");
             }
 
-            // Opcional: Limpar os campos após o envio
-            // inputTagField.value = '';
-            // inputDataField.value = '';
-            inputTagField.focus(); // Manter o foco no campo da TAG
+            // Optional: Clear fields after submission
+            // dataSourceNameField.value = ''; // Keep combobox selection
+            // inputValueField.value = '';
+            // inputAlarmField.value = '';
+            // inputTimestampField.value = '';
+            // inputTypeField.value = '';
+            // inputUnitField.value = '';
+            // inputPrecisionDigitsField.value = '';
+
+            //dataSourceNameField.focus(); // Keep focus on the combobox field
         }
     </script>
 </body>
