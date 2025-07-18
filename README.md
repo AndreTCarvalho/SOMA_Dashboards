@@ -27,7 +27,7 @@ do objeto **myScreenHandler**.
 ~~~html 
 <script type="module" src="screenHandler.js"></script>
 ~~~
-2) No script screenHandler.js, o qual utiliza a classe pai 
+2) No script **screenHandler.js**, o qual utiliza a classe pai 
 definida em **dataHandler.js**, definir a lista de **DATASOURCES** com 
 o nome das fontes de dados requeridas, conforme registrado no SOMA.
 
