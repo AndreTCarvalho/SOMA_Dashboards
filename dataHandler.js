@@ -28,7 +28,7 @@ export class DataHandler {
 
     // --- Handling the 'dataSourceName' field ---
     if (!newDataObject || typeof newDataObject.dataSourceName === 'undefined') {
-      console.error("Error: Invalid data object. Use the structure {dataSourceName: string, type: string, data: any, alarm: number, dateTime: Date|string}");
+      console.error("Error: Invalid data object. Use the structure {dataSourceName: string, type: string, data: any, unit: string, digitsOfPrecision: number, alarm: number, timestamp: number}");
       return false;
     }
 

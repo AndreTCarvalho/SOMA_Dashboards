@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<!--    <script type="module" src="dataHandler.js"></script>-->
     <script type="module" src="test_dashboard_plotly.js"></script>
     <title>Update Data</title>
     <style>
@@ -199,7 +198,7 @@
                     dataSourceName: dataSourceName,
                     data: value,
                     alarm: alarm,
-                    timestamp: new Date(timestamp), // Creating a Date object from the timestamp
+                    timestamp: 0, // Creating a Date object from the timestamp
                     type: type,
                     unit: unit,
                     digitsOfPrecision: precisionDigits

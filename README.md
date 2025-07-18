@@ -55,6 +55,7 @@ const DATASOURCES = ['Temperature', 'Pressure'];
 
 ~~~
 
-##TO DO
+## OBSERVAÇÃO
 
-* v.1.0 - Implementar timeout na interface.
+* v.1.0 - O usuário deve se responsabilizar por implementar timeout na interface, 
+evitando que dados muito antigos continuem a ser exibidos incorretamente.

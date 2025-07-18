@@ -35,7 +35,6 @@ const DATASOURCES = ['Temperature', 'Pressure'];
 
 
 
-
 class ScreenHandler extends DataHandler {
   constructor(dataSourceNames = []) {
     super(dataSourceNames); // Calls the parent class (DataHandler) constructor
@@ -135,9 +134,6 @@ class ScreenHandler extends DataHandler {
 
 }
 
-// Ensures the object is instantiated when the page loads.
-// To do this, you can add this script at the end of your <body>
-// or use a 'DOMContentLoaded' event.
 export let myScreenHandler;
 
 document.addEventListener('DOMContentLoaded', () => {
