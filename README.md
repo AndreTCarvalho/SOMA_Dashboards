@@ -1,19 +1,60 @@
 # SOMA_Dashboards
 
-O projeto contém um código simples em Javascript que disponibiliza um objeto myScreenHandler em uma janela do browser. 
-Esse objeto possui como atributo um vetor de TAGs, e é capaz de receber e armazenar em memória dados no formato:
+O projeto contém um código simples em Javascript que disponibiliza um objeto **myScreenHandler** em uma janela do browser. 
+Esse objeto possui como atributo um array de **DATASOURCES** com o nome das fontes de dado do SOMA, e é capaz de receber e armazenar em memória dados correspondentes a
+cada uma dessas fontes de dado no formato:
+~~~
+{
+      dataSourceName: string,
+      type: string,
+      data: any,
+      unit: string,
+      digitsOfPrecision: number,
+      alarm: number,
+      timestamp: number
+}
+~~~   
 
-'''
-{Tag: string, Type: string, Data: any, Alarm: number, DateTime: Date|string}
-'''   
+Esse objeto será atualizado com dados pelo Webcomponent. O próprio objeto deverá implementar a 
+atualização da página sempre que o dado for atualizado, ou em caso de timeout.
 
-No arquivo segundo o template/exemplo screenHandler.js, o usuário deve adicionar a lista de TAGs e 
-codificar a função updateScreen(), a qual se responsabilizará por exibir os dados na página HTML.
+## Utilização
 
-A página HTML deve chamar como scripts os arquivos:
-dataHandler.js - o qual não deve ser alterado;
-screenHandler.js - ou outro arquivo seguindo o mesmo template.
-Mais eventuais scripts de componentes gráficos, etc.
+1) Para atualizar o estado interface, o webcomponent do SOMA deverá chamar o método **updateData(newData)** 
+do objeto **myScreenHandler**.
 
-Esse código deverá futuramente ser embarcado em um webcomponent do SOMA, que chamará o método updateDado() para atualizar os dados no objeto myScreenHandler.
+2) Na página HTML que implementará o Dashboard, importar o script **screenHandler.js**.
+~~~html 
+<script type="module" src="screenHandler.js"></script>
+~~~
+2) No script screenHandler.js, o qual utiliza a classe pai 
+definida em **dataHandler.js**, definir a lista de **DATASOURCES** com 
+o nome das fontes de dados requeridas, conforme registrado no SOMA.
 
+~~~html
+//////////////////////////////////////////////////////////
+//     Dashboard TAG Definitions:                       //
+//////////////////////////////////////////////////////////
+
+const DATASOURCES = ['Temperature', 'Pressure'];
+~~~
+
+4) Também no no script screenHandler.js, na classe filha **ScreenHandler**,  para atualizar visualmente a própria interface, insira o seu código na função **updateScreen()**.
+
+~~~html
+
+  updateScreen() {
+    console.log("ScreenHandler: Updating the screen with new data...");
+
+         //////////////////////////////////////////////////////////
+         //     This is an Example. Replace with your Code.      //
+         //////////////////////////////////////////////////////////
+    });
+  }
+    
+
+~~~
+
+##TO DO
+
+* v.1.0 - Implementar timeout na interface.
